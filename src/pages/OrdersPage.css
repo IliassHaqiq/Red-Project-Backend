@@ -1,0 +1,8 @@
+.order-card   { padding: 24px; margin-bottom: 16px; }
+.order-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+.order-id     { font-weight: 500; margin-bottom: 4px; }
+.order-date   { color: var(--muted); font-size: 12px; }
+.order-total  { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--red); margin-top: 8px; }
+
+.order-items    { border-top: 1px solid var(--border); padding-top: 16px; }
+.order-item-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; color: var(--muted); }
