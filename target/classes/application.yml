@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:ecommerce_db
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+server:
+  port: 8080
+
+app:
+  jwt:
+    secret: VGhpc0lzQVN1cGVyU2VjcmV0S2V5Rm9yU3ByaW5nQm9vdEp3dEF1dGgxMjM0NTY3ODkw
+    expiration-ms: 86400000
