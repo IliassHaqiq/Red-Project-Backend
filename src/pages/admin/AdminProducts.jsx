@@ -6,7 +6,14 @@ export default function AdminProducts({ token, addToast }) {
   const [categories, setCategories] = useState([])
   const [loading, setLoading]       = useState(true)
   const [modal, setModal]           = useState(null)   // null | 'create' | product object
-  const [form, setForm]             = useState({ name: '', description: '', price: '', stock: '', categoryId: '' })
+  const [form, setForm] = useState({
+    name: '',
+    description: '',
+    price: '',
+    stock: '',
+    categoryId: '',
+    images: [{ imageUrl: '', primaryImage: true, displayOrder: 1 }]
+  })
   const [saving, setSaving]         = useState(false)
   const [error, setError]           = useState('')
 
@@ -20,7 +27,14 @@ export default function AdminProducts({ token, addToast }) {
   useEffect(load, [])
 
   const openCreate = () => {
-    setForm({ name: '', description: '', price: '', stock: '', categoryId: '' })
+    setForm({
+      name: '',
+      description: '',
+      price: '',
+      stock: '',
+      categoryId: '',
+      images: [{ imageUrl: '', primaryImage: true, displayOrder: 1 }]
+    })
     setError('')
     setModal('create')
   }
@@ -32,6 +46,13 @@ export default function AdminProducts({ token, addToast }) {
       price: p.price,
       stock: p.stock,
       categoryId: categories.find(c => c.name === p.category)?.id || '',
+      images: p.images?.length
+        ? p.images.map((img, index) => ({
+            imageUrl: img.imageUrl,
+            primaryImage: !!img.primaryImage,
+            displayOrder: img.displayOrder ?? index + 1
+          }))
+        : [{ imageUrl: '', primaryImage: true, displayOrder: 1 }]
     })
     setError('')
     setModal(p)
@@ -46,6 +67,13 @@ export default function AdminProducts({ token, addToast }) {
         price: parseFloat(form.price),
         stock: parseInt(form.stock),
         categoryId: parseInt(form.categoryId),
+        images: form.images
+          .filter(img => img.imageUrl.trim() !== '')
+          .map((img, index) => ({
+            imageUrl: img.imageUrl.trim(),
+            primaryImage: img.primaryImage,
+            displayOrder: index + 1
+          }))
       }
       if (modal === 'create') {
         await createProduct(body, token)
@@ -71,6 +99,59 @@ export default function AdminProducts({ token, addToast }) {
   }
 
   const set = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.value }))
+  const setImageField = (index, key, value) => {
+    setForm(f => ({
+      ...f,
+      images: f.images.map((img, i) =>
+        i === index ? { ...img, [key]: value } : img
+      )
+    }))
+  }
+  
+  const addImageField = () => {
+    setForm(f => ({
+      ...f,
+      images: [
+        ...f.images,
+        {
+          imageUrl: '',
+          primaryImage: false,
+          displayOrder: f.images.length + 1
+        }
+      ]
+    }))
+  }
+  
+  const removeImageField = (index) => {
+    setForm(f => {
+      const updated = f.images.filter((_, i) => i !== index)
+        .map((img, i) => ({
+          ...img,
+          displayOrder: i + 1
+        }))
+  
+      if (updated.length > 0 && !updated.some(img => img.primaryImage)) {
+        updated[0].primaryImage = true
+      }
+  
+      return {
+        ...f,
+        images: updated.length
+          ? updated
+          : [{ imageUrl: '', primaryImage: true, displayOrder: 1 }]
+      }
+    })
+  }
+  
+  const setPrimaryImage = (index) => {
+    setForm(f => ({
+      ...f,
+      images: f.images.map((img, i) => ({
+        ...img,
+        primaryImage: i === index
+      }))
+    }))
+  }
 
   return (
     <div>
@@ -85,30 +166,52 @@ export default function AdminProducts({ token, addToast }) {
       {loading ? <div className="spinner" /> : (
         <div className="card">
           <table className="table">
-            <thead>
-              <tr>
-                <th>ID</th><th>Nom</th><th>Catégorie</th><th>Prix</th><th>Stock</th><th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map(p => (
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Image</th>
+              <th>Nom</th>
+              <th>Catégorie</th>
+              <th>Prix</th>
+              <th>Stock</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map(p => {
+              const primaryImage =
+                p.images?.find(img => img.primaryImage)?.imageUrl ||
+                p.images?.[0]?.imageUrl ||
+                ''
+
+              return (
                 <tr key={p.id}>
-                  <td style={{ color: 'var(--muted)' }}>#{p.id}</td>
-                  <td style={{ fontWeight: 500 }}>{p.name}</td>
-                  <td><span className="tag">{p.category}</span></td>
-                  <td style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 16, color: 'var(--red)' }}>
-                    {Number(p.price).toFixed(2)} €
-                  </td>
-                  <td style={{ color: p.stock > 0 ? 'var(--success)' : '#ff4d4d' }}>{p.stock}</td>
+                  <td>#{p.id}</td>
                   <td>
-                    <div style={{ display: 'flex', gap: 8 }}>
-                      <button className="btn btn-ghost btn-sm" onClick={() => openEdit(p)}>Modifier</button>
-                      <button className="btn btn-danger btn-sm" onClick={() => del(p.id)}>Supprimer</button>
-                    </div>
+                    {primaryImage ? (
+                      <img
+                        src={primaryImage}
+                        alt={p.name}
+                        className="admin-product-thumb"
+                      />
+                    ) : (
+                      <div className="admin-product-thumb admin-product-thumb-empty">
+                        —
+                      </div>
+                    )}
+                  </td>
+                  <td>{p.name}</td>
+                  <td>{p.category}</td>
+                  <td>{Number(p.price).toFixed(2)} €</td>
+                  <td>{p.stock}</td>
+                  <td>
+                    <button onClick={() => openEdit(p)}>Modifier</button>
+                    <button onClick={() => del(p.id)}>Supprimer</button>
                   </td>
                 </tr>
-              ))}
-            </tbody>
+              )
+            })}
+          </tbody>
           </table>
         </div>
       )}
@@ -147,7 +250,53 @@ export default function AdminProducts({ token, addToast }) {
                 {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
             </div>
+            <div className="field">
+              <label className="label">Images du produit</label>
 
+              <div className="admin-images-list">
+                {form.images.map((img, index) => (
+                  <div key={index} className="admin-image-row">
+                    <input
+                      className="input"
+                      type="text"
+                      placeholder="https://..."
+                      value={img.imageUrl}
+                      onChange={(e) => setImageField(index, 'imageUrl', e.target.value)}
+                    />
+
+                    <label className="admin-image-primary">
+                      <input
+                        type="radio"
+                        name="primaryImage"
+                        checked={img.primaryImage}
+                        onChange={() => setPrimaryImage(index)}
+                      />
+                      Principale
+                    </label>
+
+                    <button
+                      type="button"
+                      className="btn btn-ghost"
+                      onClick={() => removeImageField(index)}
+                    >
+                      Supprimer
+                    </button>
+
+                    {img.imageUrl && (
+                      <img
+                        src={img.imageUrl}
+                        alt={`Prévisualisation ${index + 1}`}
+                        className="admin-image-preview"
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <button type="button" className="btn btn-secondary" onClick={addImageField}>
+                + Ajouter une image
+              </button>
+            </div>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 8 }}>
               <button className="btn btn-ghost" onClick={() => setModal(null)}>Annuler</button>
               <button className="btn btn-primary" onClick={save} disabled={saving}>
