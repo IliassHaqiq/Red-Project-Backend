@@ -22,6 +22,16 @@ export default function ShopPage({ token, onAddToCart, addToast, setPage, setDet
     return matchCat && matchSearch
   })
 
+
+  const getPrimaryImage = (product) => {
+    return (
+      product.images?.find((img) => img.primaryImage)?.imageUrl ||
+      product.images?.[0]?.imageUrl ||
+      '/placeholder-product.png'
+    )
+  }
+
+
   const openDetail = (product) => {
     setDetailProduct(product)
     setPage('detail')
@@ -76,21 +86,26 @@ export default function ShopPage({ token, onAddToCart, addToast, setPage, setDet
         </div>
       ) : (
         <div className="products-grid">
-          {filtered.map((p, i) => (
-            <div
+          {filtered.map((p) => (
+            <article
               key={p.id}
               className="product-card"
-              style={{ animationDelay: `${i * 0.04}s` }}
               onClick={() => openDetail(p)}
             >
+              <img
+                src={getPrimaryImage(p)}
+                alt={p.name}
+                className="product-card-image"
+              />
+
               <div className="product-category">{p.category}</div>
-              <div className="product-name">{p.name}</div>
+              <h3 className="product-name">{p.name}</h3>
               <div className="product-price">{Number(p.price).toFixed(2)} €</div>
-              <div className="product-desc">{p.description}</div>
+              <p className="product-desc">{p.description}</p>
               <div className={`product-stock ${p.stock > 0 ? 'in-stock' : 'out-stock'}`}>
                 {p.stock > 0 ? `✓ ${p.stock} en stock` : '✗ Rupture de stock'}
               </div>
-            </div>
+            </article>
           ))}
         </div>
       )}
