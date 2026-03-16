@@ -1,3 +1,5 @@
+import { clearStorage } from '../utils/storage'
+
 const BASE_URL = 'http://localhost:8080/api'
 
 /**
@@ -15,6 +17,13 @@ export async function request(path, options = {}, token = null) {
   const response = await fetch(`${BASE_URL}${path}`, { headers, ...options })
 
   if (!response.ok) {
+    // Si le token est invalide ou expiré (401), nettoyer le storage
+    if (response.status === 401 && token) {
+      clearStorage()
+      // Déclencher un événement personnalisé pour notifier App.jsx
+      window.dispatchEvent(new CustomEvent('auth:expired'))
+    }
+    
     const err = await response.json().catch(() => ({ message: 'Erreur serveur' }))
     throw new Error(err.message || 'Erreur')
   }
@@ -44,3 +53,21 @@ export const getMyOrders      = (token)        => request('/orders/me',   {}, to
 export const getAllOrders      = (token)        => request('/admin/orders', {}, token)
 export const updateOrderStatus = (id, status, token) =>
   request(`/admin/orders/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }, token)
+
+// ── Users (Admin Sup) ─────────────────────────────────────────────────────────
+export const getAllUsers     = (token) => request('/adminsup/users', {}, token)
+export const updateUserRole  = (id, role, token) =>
+  request(`/adminsup/users/${id}/role`, { method: 'PATCH', body: JSON.stringify({ role }) }, token)
+export const deleteUser      = (id, token) =>
+  request(`/adminsup/users/${id}`, { method: 'DELETE' }, token)
+export const createAdminUser = (body, token) =>
+  request('/adminsup/users', { method: 'POST', body: JSON.stringify(body) }, token)
+export const updateAdminUser = (id, body, token) =>
+  request(`/adminsup/users/${id}`, { method: 'PUT', body: JSON.stringify(body) }, token)
+
+// ── Notifications ─────────────────────────────────────────────────────────────
+export const getNotifications    = (token)        => request('/notifications', {}, token)
+export const getUnreadNotifications = (token)     => request('/notifications/unread', {}, token)
+export const getUnreadCount       = (token)        => request('/notifications/unread/count', {}, token)
+export const markNotificationRead = (id, token)   => request(`/notifications/${id}/read`, { method: 'PATCH' }, token)
+export const markAllNotificationsRead = (token)   => request('/notifications/read-all', { method: 'PATCH' }, token)

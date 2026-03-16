@@ -22,15 +22,9 @@ export default function ShopPage({ token, onAddToCart, addToast, setPage, setDet
     return matchCat && matchSearch
   })
 
-
-  const getPrimaryImage = (product) => {
-    return (
-      product.images?.find((img) => img.primaryImage)?.imageUrl ||
-      product.images?.[0]?.imageUrl ||
-      '/placeholder-product.png'
-    )
-  }
-
+  const getPrimaryImage = (p) =>
+    p.images?.find(img => img.primaryImage)?.imageUrl ||
+    p.images?.[0]?.imageUrl || ''
 
   const openDetail = (product) => {
     setDetailProduct(product)
@@ -38,77 +32,110 @@ export default function ShopPage({ token, onAddToCart, addToast, setPage, setDet
   }
 
   if (loading) return (
-    <div className="page shop-loading">
-      <div className="spinner" style={{ width: 32, height: 32 }} />
+    <div className="shop-loading">
+      <span className="spinner spinner-lg" style={{ marginTop: 80 }} />
     </div>
   )
 
   return (
-    <div className="page fade-in">
-
-      {/* Header */}
-      <div className="section-header">
-        <div>
-          <h1 className="section-title">Notre Collection</h1>
-          <div className="divider" />
-          <p className="shop-count">{filtered.length} produit{filtered.length !== 1 ? 's' : ''}</p>
-        </div>
-        <input
-          className="input shop-search"
-          placeholder="Rechercher..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
+    <div>
+      {/* ── Hero ── */}
+      <div className="shop-hero">
+        <div className="shop-hero-label">Nouvelle collection</div>
+        <h1 className="shop-hero-title">Notre Collection</h1>
+        <p className="shop-hero-sub">Découvrez des produits sélectionnés avec soin pour vous</p>
       </div>
 
-      {/* Category filter */}
-      <div className="cat-filter">
-        <button className={`cat-btn ${activeCat === 'all' ? 'active' : ''}`} onClick={() => setActiveCat('all')}>
-          Tout
-        </button>
-        {categories.map(c => (
+      {/* ── Sticky toolbar ── */}
+      <div className="shop-toolbar">
+        <div className="shop-search-wrap">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+            <circle cx="7" cy="7" r="5"/><path d="m11 11 3 3"/>
+          </svg>
+          <input
+            placeholder="Rechercher..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+        </div>
+
+        <div className="shop-toolbar-sep" />
+
+        <div className="shop-cat-tabs">
           <button
-            key={c.id}
-            className={`cat-btn ${activeCat === c.name ? 'active' : ''}`}
-            onClick={() => setActiveCat(c.name)}
+            className={`shop-cat-tab ${activeCat === 'all' ? 'active' : ''}`}
+            onClick={() => setActiveCat('all')}
           >
-            {c.name}
+            Tout
           </button>
-        ))}
-      </div>
-
-      {/* Grid */}
-      {filtered.length === 0 ? (
-        <div className="empty">
-          <div className="empty-icon">🔍</div>
-          <div className="empty-title">Aucun produit trouvé</div>
-          <p>Essayez une autre catégorie ou terme de recherche</p>
-        </div>
-      ) : (
-        <div className="products-grid">
-          {filtered.map((p) => (
-            <article
-              key={p.id}
-              className="product-card"
-              onClick={() => openDetail(p)}
+          {categories.map(c => (
+            <button
+              key={c.id}
+              className={`shop-cat-tab ${activeCat === c.name ? 'active' : ''}`}
+              onClick={() => setActiveCat(c.name)}
             >
-              <img
-                src={getPrimaryImage(p)}
-                alt={p.name}
-                className="product-card-image"
-              />
-
-              <div className="product-category">{p.category}</div>
-              <h3 className="product-name">{p.name}</h3>
-              <div className="product-price">{Number(p.price).toFixed(2)} €</div>
-              <p className="product-desc">{p.description}</p>
-              <div className={`product-stock ${p.stock > 0 ? 'in-stock' : 'out-stock'}`}>
-                {p.stock > 0 ? `✓ ${p.stock} en stock` : '✗ Rupture de stock'}
-              </div>
-            </article>
+              {c.name}
+            </button>
           ))}
         </div>
-      )}
+
+        <span className="shop-count-badge">
+          {filtered.length} produit{filtered.length !== 1 ? 's' : ''}
+        </span>
+      </div>
+
+      {/* ── Grid ── */}
+      <div className="shop-body fade-in">
+        {filtered.length === 0 ? (
+          <div className="empty">
+            <div className="empty-icon">🔍</div>
+            <div className="empty-title">Aucun produit trouvé</div>
+            <p>Essayez une autre catégorie ou terme de recherche</p>
+          </div>
+        ) : (
+          <div className="products-grid">
+            {filtered.map((p, i) => {
+              const img = getPrimaryImage(p)
+              return (
+                <article
+                  key={p.id}
+                  className="product-card"
+                  onClick={() => openDetail(p)}
+                  style={{ animationDelay: `${i * 40}ms` }}
+                >
+                  <div className="product-card-image-wrap">
+                    {img ? (
+                      <img src={img} alt={p.name} className="product-card-image" />
+                    ) : (
+                      <div className="product-card-image-placeholder">📦</div>
+                    )}
+                    {p.stock === 0 && (
+                      <span className="product-card-badge out">Rupture</span>
+                    )}
+                    {p.stock > 0 && p.stock < 5 && (
+                      <span className="product-card-badge">Dernières pièces</span>
+                    )}
+                  </div>
+
+                  <div className="product-card-body">
+                    <div className="product-category">{p.category}</div>
+                    <div className="product-name">{p.name}</div>
+                    {p.description && (
+                      <p className="product-desc">{p.description}</p>
+                    )}
+                    <div className="product-card-footer">
+                      <span className="product-price">{Number(p.price).toFixed(2)} €</span>
+                      <span className={`product-stock ${p.stock > 0 ? 'in-stock' : 'out-stock'}`}>
+                        {p.stock > 0 ? `✓ ${p.stock} en stock` : '✗ Rupture'}
+                      </span>
+                    </div>
+                  </div>
+                </article>
+              )
+            })}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

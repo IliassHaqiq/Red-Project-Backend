@@ -40,8 +40,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/h2-console/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/categories/**").permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/orders/**").hasAnyRole("CLIENT", "ADMIN")
+                        .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "ADMINSUP")
+                        .requestMatchers("/api/adminsup/**").hasRole("ADMINSUP")
+                        .requestMatchers("/api/orders/**", "/api/notifications/**").hasAnyRole("CLIENT", "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()))

@@ -25,6 +25,8 @@ public class DataInitializer implements CommandLineRunner {
                 .orElseGet(() -> roleRepository.save(Role.builder().name(RoleName.ROLE_CLIENT).build()));
         Role adminRole = roleRepository.findByName(RoleName.ROLE_ADMIN)
                 .orElseGet(() -> roleRepository.save(Role.builder().name(RoleName.ROLE_ADMIN).build()));
+        Role adminSupRole = roleRepository.findByName(RoleName.ROLE_ADMINSUP)
+                .orElseGet(() -> roleRepository.save(Role.builder().name(RoleName.ROLE_ADMINSUP).build()));
 
         if (!userRepository.existsByEmail("admin@shop.com")) {
             userRepository.save(User.builder()
@@ -32,6 +34,14 @@ public class DataInitializer implements CommandLineRunner {
                     .email("admin@shop.com")
                     .password(passwordEncoder.encode("Admin123!"))
                     .roles(Set.of(adminRole))
+                    .build());
+        }
+        if (!userRepository.existsByEmail("adminsup@shop.com")) {
+            userRepository.save(User.builder()
+                    .fullName("Admin Sup")
+                    .email("adminsup@shop.com")
+                    .password(passwordEncoder.encode("Adminsup123!"))
+                    .roles(Set.of(adminSupRole))
                     .build());
         }
         if (!userRepository.existsByEmail("client@shop.com")) {

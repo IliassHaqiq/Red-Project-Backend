@@ -31,35 +31,66 @@ export default function AdminCategories({ token, addToast }) {
 
   return (
     <div>
-      <h2 className="section-title">Catégories</h2>
-      <div className="divider" />
-
-      <div className="card" style={{ padding: 28, maxWidth: 480, marginBottom: 32 }}>
-        <div style={{ fontWeight: 500, marginBottom: 16 }}>Nouvelle catégorie</div>
-        {error && <div className="alert alert-error">{error}</div>}
-        <div style={{ display: 'flex', gap: 12 }}>
-          <input
-            className="input"
-            placeholder="Nom de la catégorie"
-            value={name}
-            onChange={e => setName(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && create()}
-          />
-          <button className="btn btn-primary" onClick={create} disabled={saving}>
-            {saving ? <span className="spinner" /> : 'Créer'}
-          </button>
+      {/* Header */}
+      <div className="admin-page-header">
+        <div>
+          <h1 className="admin-page-title">Catégories</h1>
+          <p className="admin-page-subtitle">{categories.length} catégorie{categories.length !== 1 ? 's' : ''} configurée{categories.length !== 1 ? 's' : ''}</p>
         </div>
       </div>
 
-      {loading ? <div className="spinner" /> : (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-          {categories.map(c => (
-            <div key={c.id} className="card" style={{ padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ fontSize: 14, fontWeight: 500 }}>{c.name}</span>
-              <span style={{ color: 'var(--muted)', fontSize: 12 }}>#{c.id}</span>
-            </div>
-          ))}
+      {/* Create form */}
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '24px', maxWidth: 520, marginBottom: 32, boxShadow: 'var(--shadow-sm)' }}>
+        <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 14, color: 'var(--text)' }}>
+          Ajouter une catégorie
         </div>
+
+        {error && <div className="alert alert-error">{error}</div>}
+
+        <div style={{ display: 'flex', gap: 10 }}>
+          <input
+            className="input"
+            placeholder="Ex: Robes, Accessoires, Chaussures..."
+            value={name}
+            onChange={e => setName(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && create()}
+            style={{ flex: 1 }}
+          />
+          <button className="btn btn-primary" onClick={create} disabled={saving || !name.trim()}>
+            {saving ? <span className="spinner" /> : 'Créer'}
+          </button>
+        </div>
+        <p style={{ fontSize: 12, color: 'var(--muted-2)', marginTop: 10 }}>
+          Appuyez sur Entrée ou cliquez Créer pour ajouter la catégorie.
+        </p>
+      </div>
+
+      {/* Categories grid */}
+      {loading ? (
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '40px 0' }}>
+          <span className="spinner spinner-lg" />
+        </div>
+      ) : categories.length === 0 ? (
+        <div className="empty">
+          <div className="empty-icon">🏷️</div>
+          <div className="empty-title">Aucune catégorie</div>
+          <p>Créez votre première catégorie ci-dessus</p>
+        </div>
+      ) : (
+        <>
+          <div style={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--muted-2)', marginBottom: 14 }}>
+            {categories.length} catégorie{categories.length !== 1 ? 's' : ''}
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 10 }}>
+            {categories.map(c => (
+              <div key={c.id} className="category-chip">
+                <span style={{ fontSize: 18 }}>🏷️</span>
+                <span style={{ flex: 1, fontWeight: 500 }}>{c.name}</span>
+                <span className="category-chip-id">#{c.id}</span>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   )

@@ -20,6 +20,7 @@ public class OrderService {
     private final CustomerOrderRepository orderRepository;
     private final UserRepository userRepository;
     private final ProductService productService;
+    private final NotificationService notificationService;
 
     @Transactional
     public OrderResponse createOrder(String customerEmail, OrderRequest request) {
@@ -55,7 +56,27 @@ public class OrderService {
 
         order.setItems(items);
         order.setTotalAmount(total);
-        return toResponse(orderRepository.save(order));
+        CustomerOrder savedOrder = orderRepository.save(order);
+        
+        // Créer une notification pour le client
+        notificationService.createNotification(
+                customerEmail,
+                String.format("Votre commande #%d d'un montant de %.2f € a été validée avec succès.", savedOrder.getId(), total),
+                "ORDER_CREATED",
+                "ORDER",
+                savedOrder.getId()
+        );
+        
+        // Notifier tous les admins
+        notificationService.notifyAllAdmins(
+                String.format("Nouvelle commande #%d de %.2f € passée par %s", 
+                        savedOrder.getId(), total, customer.getFullName() != null ? customer.getFullName() : customer.getEmail()),
+                "ORDER_CREATED",
+                "ORDER",
+                savedOrder.getId()
+        );
+        
+        return toResponse(savedOrder);
     }
 
     public List<OrderResponse> getMyOrders(String email) {
@@ -74,8 +95,23 @@ public class OrderService {
         if (order.getStatus() == OrderStatus.VALIDEE && newStatus == OrderStatus.EN_COURS) {
             throw new BusinessException("Une commande validee est definitive");
         }
+        OrderStatus oldStatus = order.getStatus();
         order.setStatus(newStatus);
-        return toResponse(orderRepository.save(order));
+        CustomerOrder savedOrder = orderRepository.save(order);
+        
+        // Créer une notification pour le client si le statut change
+        if (oldStatus != newStatus) {
+            notificationService.createNotification(
+                    order.getCustomer().getEmail(),
+                    String.format("Le statut de votre commande #%d a été modifié : %s → %s", 
+                            savedOrder.getId(), oldStatus, newStatus),
+                    "ORDER_STATUS_CHANGED",
+                    "ORDER",
+                    savedOrder.getId()
+            );
+        }
+        
+        return toResponse(savedOrder);
     }
 
     private OrderResponse toResponse(CustomerOrder order) {
