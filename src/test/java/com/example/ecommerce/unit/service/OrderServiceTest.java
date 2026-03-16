@@ -9,6 +9,7 @@ import com.example.ecommerce.entity.User;
 import com.example.ecommerce.exception.BusinessException;
 import com.example.ecommerce.repository.CustomerOrderRepository;
 import com.example.ecommerce.repository.UserRepository;
+import com.example.ecommerce.service.NotificationService;
 import com.example.ecommerce.service.OrderService;
 import com.example.ecommerce.service.ProductService;
 import org.junit.jupiter.api.Test;
@@ -36,6 +37,9 @@ class OrderServiceTest {
 
     @Mock
     private ProductService productService;
+
+    @Mock
+    private NotificationService notificationService;
 
     @InjectMocks
     private OrderService orderService;

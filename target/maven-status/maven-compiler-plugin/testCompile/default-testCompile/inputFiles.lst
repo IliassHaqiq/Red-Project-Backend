@@ -1,4 +1,11 @@
+C:\Users\ilias\Desktop\ecommerce-backend-springboot\ecommerce-backend\src\test\java\com\example\ecommerce\integration\controller\AdminProductControllerIT.java
+C:\Users\ilias\Desktop\ecommerce-backend-springboot\ecommerce-backend\src\test\java\com\example\ecommerce\integration\controller\AuthControllerIT.java
+C:\Users\ilias\Desktop\ecommerce-backend-springboot\ecommerce-backend\src\test\java\com\example\ecommerce\integration\controller\NotificationAndAdminUserControllerIT.java
+C:\Users\ilias\Desktop\ecommerce-backend-springboot\ecommerce-backend\src\test\java\com\example\ecommerce\integration\controller\OrderAndAdminOrderControllerIT.java
+C:\Users\ilias\Desktop\ecommerce-backend-springboot\ecommerce-backend\src\test\java\com\example\ecommerce\integration\controller\ProductAndCategoryControllerIT.java
 C:\Users\ilias\Desktop\ecommerce-backend-springboot\ecommerce-backend\src\test\java\com\example\ecommerce\service\OrderServiceTest.java
 C:\Users\ilias\Desktop\ecommerce-backend-springboot\ecommerce-backend\src\test\java\com\example\ecommerce\unit\service\AuthServiceTest.java
+C:\Users\ilias\Desktop\ecommerce-backend-springboot\ecommerce-backend\src\test\java\com\example\ecommerce\unit\service\CategoryServiceTest.java
+C:\Users\ilias\Desktop\ecommerce-backend-springboot\ecommerce-backend\src\test\java\com\example\ecommerce\unit\service\NotificationServiceTest.java
 C:\Users\ilias\Desktop\ecommerce-backend-springboot\ecommerce-backend\src\test\java\com\example\ecommerce\unit\service\OrderServiceTest.java
 C:\Users\ilias\Desktop\ecommerce-backend-springboot\ecommerce-backend\src\test\java\com\example\ecommerce\unit\service\ProductServiceTest.java
