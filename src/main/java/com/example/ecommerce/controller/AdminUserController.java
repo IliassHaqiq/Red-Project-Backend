@@ -132,15 +132,30 @@ public class AdminUserController {
     }
 
     private RoleName parseAdminRole(String role) {
+        if (role == null || role.isBlank()) {
+            throw new BusinessException("Rôle invalide");
+        }
+
+        String normalized = role.trim().toUpperCase();
+
+        // Accepter les libellés envoyés par le front
+        if (normalized.equals("ADMIN")) {
+            normalized = "ROLE_ADMIN";
+        } else if (normalized.equals("ADMINSUP") || normalized.equals("ADMIN SUP") || normalized.equals("ADMIN_SUP")) {
+            normalized = "ROLE_ADMINSUP";
+        }
+
         RoleName roleName;
         try {
-            roleName = RoleName.valueOf(role);
+            roleName = RoleName.valueOf(normalized);
         } catch (IllegalArgumentException e) {
             throw new BusinessException("Rôle invalide");
         }
+
         if (roleName == RoleName.ROLE_CLIENT) {
             throw new BusinessException("Les clients ne sont pas gérés ici");
         }
+
         return roleName;
     }
 }

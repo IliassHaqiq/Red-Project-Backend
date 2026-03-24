@@ -1,0 +1,11 @@
+com\example\ecommerce\unit\service\NotificationServiceTest.class
+com\example\ecommerce\integration\controller\ProductAndCategoryControllerIT.class
+com\example\ecommerce\unit\service\CategoryServiceTest.class
+com\example\ecommerce\integration\controller\AuthControllerIT.class
+com\example\ecommerce\unit\service\AuthServiceTest.class
+com\example\ecommerce\unit\service\OrderServiceTest.class
+com\example\ecommerce\integration\controller\OrderAndAdminOrderControllerIT.class
+com\example\ecommerce\integration\controller\NotificationAndAdminUserControllerIT.class
+com\example\ecommerce\unit\service\ProductServiceTest.class
+com\example\ecommerce\integration\controller\AdminProductControllerIT.class
+com\example\ecommerce\service\OrderServiceTest.class
